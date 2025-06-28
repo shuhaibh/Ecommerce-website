@@ -3,6 +3,8 @@ const express = require('express')
 const app = express()
 const router = require('./routes/index')
 const connectDB = require('./config/db')
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 require('dotenv').config()
 const port = process.env.PORT
@@ -10,7 +12,7 @@ const port = process.env.PORT
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.send('Hi Nadha')
+  res.send('Hi Muhammad Shuhaibh')
 })
 
 connectDB()

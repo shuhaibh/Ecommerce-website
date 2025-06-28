@@ -1,82 +1,64 @@
 
-const Product = require('../models/Product');
-const Item = require('../models/Item');
+const Review = require('../models/Review');
 
-const getAllProducts = async (req, res) => {
-  try {
-    const products = await Product.find({ status: 'approved' }).populate('item_id seller_id');
-    res.status(200).json(products);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch products' });
-  }
-};
-
-const getProductById = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.productId).populate('item_id seller_id');
-    if (!product) return res.status(404).json({ message: 'Product not found' });
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch product' });
-  }
-};
-
-const createProduct = async (req, res) => {
-  try {
-    const { item_id } = req.body;
-    const seller_id = req.user._id;
-
-    const product = await Product.create({
-      item_id,
-      seller_id,
-      status: 'pending' 
-    });
-
-    res.status(201).json({ message: 'Product created', product });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create product' });
-  }
-};
-
-const updateProduct = async (req, res) => {
+const getReviews = async (req, res) => {
   try {
     const { productId } = req.params;
-
-    const updated = await Product.findOneAndUpdate(
-      { _id: productId, seller_id: req.user._id },
-      req.body,
-      { new: true }
-    );
-
-    if (!updated) return res.status(404).json({ message: 'Product not found or not owned by you' });
-
-    res.status(200).json({ message: 'Product updated', product: updated });
+    const reviews = await Review.find({ product_id: productId }).populate('user_id', 'name');
+    res.status(200).json(reviews);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update product' });
+    res.status(500).json({ error: 'Failed to fetch reviews' });
   }
 };
 
-const deleteProduct = async (req, res) => {
+const addReview = async (req, res) => {
   try {
     const { productId } = req.params;
+    const { rating, comment } = req.body;
 
-    const deleted = await Product.findOneAndDelete({
-      _id: productId,
-      seller_id: req.user._id
+    const existing = await Review.findOne({
+      user_id: req.user._id,
+      product_id: productId
     });
 
-    if (!deleted) return res.status(404).json({ message: 'Product not found or not owned by you' });
+    if (existing) {
+      return res.status(400).json({ message: 'You already reviewed this product' });
+    }
 
-    res.status(200).json({ message: 'Product deleted' });
+    const review = await Review.create({
+      product_id: productId,
+      user_id: req.user._id,
+      rating,
+      comment
+    });
+
+    res.status(201).json({ message: 'Review added', review });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete product' });
+    res.status(500).json({ error: 'Failed to add review' });
+  }
+};
+
+const deleteReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+
+    const review = await Review.findById(reviewId);
+
+    if (!review) return res.status(404).json({ message: 'Review not found' });
+
+    if (review.user_id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to delete this review' });
+    }
+
+    await review.deleteOne();
+    res.status(200).json({ message: 'Review deleted' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete review' });
   }
 };
 
 module.exports = {
-  getAllProducts,
-  getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct
+  getReviews,
+  addReview,
+  deleteReview
 };
