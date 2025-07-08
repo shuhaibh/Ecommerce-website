@@ -1,4 +1,4 @@
-    const express = require('express')
+const express = require('express')
 const itemRouter = express.Router()
 
 const { getAllItems } = require('../controllers/itemController')

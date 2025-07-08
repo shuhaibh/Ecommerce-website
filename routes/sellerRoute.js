@@ -6,15 +6,17 @@ const { uploadProduct } = require('../controllers/sellerController');
 const { updateSellerProduct } = require('../controllers/sellerController');
 const { getSellerOrders } = require('../controllers/sellerController');
 
+const authSeller = require('../middlewares/authSeller')
 
+const upload = require('../middlewares/multer');
 
-sellerRouter.get('/products', getSellerProducts)
+sellerRouter.get('/products', authSeller, getSellerProducts)
 
-sellerRouter.post('/upload', uploadProduct)
+sellerRouter.post('/upload', authSeller, upload.single('image'), uploadProduct)
 
-sellerRouter.patch('/update/:sellerId', updateSellerProduct)
+sellerRouter.patch('/update/:productId', authSeller, updateSellerProduct)
 
-sellerRouter.get('/orders', getSellerOrders)
+sellerRouter.get('/orders', authSeller, getSellerOrders)
 
 
 module.exports = sellerRouter

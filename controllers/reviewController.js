@@ -1,4 +1,3 @@
-
 const Review = require('../models/Review');
 
 const getReviews = async (req, res) => {
@@ -27,7 +26,7 @@ const addReview = async (req, res) => {
 
     const review = await Review.create({
       product_id: productId,
-      user_id: req.user._id,
+      user_id: req.user.id,
       rating,
       comment
     });
@@ -46,7 +45,7 @@ const deleteReview = async (req, res) => {
 
     if (!review) return res.status(404).json({ message: 'Review not found' });
 
-    if (review.user_id.toString() !== req.user._id.toString()) {
+    if (review.user_id.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: 'Not authorized to delete this review' });
     }
 

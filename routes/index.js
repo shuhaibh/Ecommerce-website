@@ -18,5 +18,6 @@ router.use('/orders', orderRouter)
 router.use('/seller', sellerRouter)
 router.use('/reviews', reviewRouter)
 router.use('/admin', adminRouter)
+router.use('/payment', require('./paymentRoute'))
 
 module.exports = router

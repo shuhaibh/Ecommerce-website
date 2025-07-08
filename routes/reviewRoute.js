@@ -5,13 +5,13 @@ const { getReviews } = require('../controllers/reviewController');
 const { addReview } = require('../controllers/reviewController');
 const { deleteReview } = require('../controllers/reviewController');
 
+const authUser = require('../middlewares/authUser')
 
+reviewRouter.get('/:productId', authUser, getReviews)
 
-reviewRouter.get('/:productId', getReviews)
+reviewRouter.post('/:productId', authUser, addReview)
 
-reviewRouter.post('/:productId', addReview)
-
-reviewRouter.delete('/:reviewId', deleteReview)
+reviewRouter.delete('/:reviewId', authUser, deleteReview)
 
 
 module.exports = reviewRouter

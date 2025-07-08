@@ -57,9 +57,11 @@ const login = async (req, res) => {
 
     const userObject = userExists.toObject()
     delete userObject.password
-    const token = createToken(userExists._id,'user')
+    const token = createToken(userExists._id, userExists.role, userExists.isSeller)
 
     const node_env = process.env.NODE_ENV
+
+    userObject.token = token
 
     console.log(token)
     console.log(process.env.NODE_ENV)
@@ -100,18 +102,17 @@ const getProfile = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
   try {
-    const { name, phoneNo, address } = req.body;
+    const { name, email, phoneNo, password, address, role } = req.body || {};
     const userId = req.user.id;
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { name, phoneNo, address },
-      { new: true }
-    ).select('-password');
+    const userData = await User.findByIdAndUpdate(userId, { name, email, phoneNo, password, address, role}, { new: true })
+    const userObject = userData.toObject()
+    delete userObject.password
 
-    res.status(200).json({ message: 'Profile updated', user });
+    res.json({data: userObject, message:"User details updated."})
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update profile' });
+    console.log(error)
+    res.status(error.status || 500).json({error: error.message|| "Internal server error"})
   }
 };
 
@@ -142,6 +143,40 @@ const checkUser = async (req, res, next) => {
   }
 };
 
+const becomeSeller = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.isSeller) {
+      return res.status(400).json({ message: 'Already a seller' });
+    }
+
+    user.isSeller = true;
+    await user.save();
+
+    const token = createToken(user._id, user.role, user.isSeller);
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'PRODUCTION',
+      sameSite: 'Strict',
+      maxAge: 60 * 60 * 1000,
+    });
+
+    const userObject = user.toObject();
+    delete userObject.password;
+
+    res.status(200).json({
+      message: 'You are now a seller',
+      user: userObject
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to become seller' });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -149,5 +184,6 @@ module.exports = {
   getProfile,
   updateProfile,
   deleteUser,
-  checkUser
-};
+  checkUser,
+  becomeSeller
+};  

@@ -9,13 +9,14 @@ const placeOrder = async (req, res) => {
     }
 
     const order = await Order.create({
-      user_id: req.user._id,
+      user_id: req.user.id,
       products_id,
       amount
     });
 
     res.status(201).json({ message: 'Order placed successfully', order });
   } catch (error) {
+    console.error("Order Placement Error:", error);
     res.status(500).json({ error: 'Failed to place order' });
   }
 };
@@ -24,7 +25,7 @@ const getUserOrders = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    if (req.user._id.toString() !== userId && req.user.role !== 'admin') {
+    if (req.user.id.toString() !== userId && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Unauthorized access' });
     }
 

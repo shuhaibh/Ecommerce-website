@@ -7,16 +7,17 @@ const { updateCartItem } = require('../controllers/cartController');
 const { removeFromCart } = require('../controllers/cartController');
 const { clearCart } = require('../controllers/cartController');
 
+const authUser = require('../middlewares/authUser')
 
-cartRouter.get('/', getCart)
+cartRouter.get('/', authUser, getCart)
 
-cartRouter.post('/add', addToCart)
+cartRouter.post('/add', authUser, addToCart)
 
-cartRouter.patch('/update/:productId', updateCartItem)
+cartRouter.patch('/update/:productId', authUser, updateCartItem)
 
-cartRouter.delete('/remove/:productId', removeFromCart)
+cartRouter.delete('/remove/:productId', authUser, removeFromCart)
 
-cartRouter.delete('/clear', clearCart)
+cartRouter.delete('/clear', authUser, clearCart)
 
 
 module.exports = cartRouter

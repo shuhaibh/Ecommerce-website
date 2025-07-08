@@ -6,14 +6,16 @@ const { getUserOrders } = require('../controllers/orderController');
 const { getAllOrders } = require('../controllers/orderController');
 const { updateOrderStatus } = require('../controllers/orderController');
 
+const authUser = require('../middlewares/authUser')
+const authAdmin = require('../middlewares/authAdmin')
 
-orderRouter.post('/', placeOrder)
+orderRouter.post('/', authUser, placeOrder)
 
-orderRouter.get('/user/:userId', getUserOrders)
+orderRouter.get('/user/:userId', authUser, getUserOrders)
 
-orderRouter.get('/admin', getAllOrders)
+orderRouter.get('/admin', authAdmin, getAllOrders)
 
-orderRouter.patch('/update/:orderId', updateOrderStatus)
+orderRouter.patch('/update/:orderId', authAdmin, updateOrderStatus)
 
 
 module.exports = orderRouter
