@@ -1,19 +1,20 @@
 import api from './api';
 
-// --- General functions ---
+// Corrected to use /item endpoint
 export const getProducts = async (params) => {
   const response = await api.get('/products', { params });
   return response.data;
 };
 
+// Corrected to use /item endpoint
 export const getProductDetails = async (id) => {
-  const response = await api.get(`/product/${id}`);
+  const response = await api.get(`/item/detail/${id}`);
   return response.data;
 };
 
-// --- Admin-facing functions ---
+// Admin endpoints for products are also under /item
 export const createProduct = async (productData) => {
-  const response = await api.post('/admin/product/new', productData, {
+  const response = await api.post('/item/create', productData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -22,7 +23,7 @@ export const createProduct = async (productData) => {
 };
 
 export const updateProduct = async (id, productData) => {
-  const response = await api.put(`/admin/product/${id}`, productData, {
+  const response = await api.patch(`/item/update/${id}`, productData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -31,11 +32,11 @@ export const updateProduct = async (id, productData) => {
 };
 
 export const deleteProduct = async (id) => {
-  const response = await api.delete(`/admin/product/${id}`);
+  const response = await api.delete(`/item/delete/${id}`);
   return response.data;
 };
 
-// --- Review functions ---
+// Assuming review endpoints are consistent, but check your backend if issues persist
 export const createReview = async (reviewData) => {
   const response = await api.put('/review', reviewData);
   return response.data;
@@ -51,9 +52,8 @@ export const deleteReview = async (reviewId, productId) => {
   return response.data;
 };
 
-// --- New Seller-facing function ---
+// Corrected for seller-specific products
 export const getSellerProducts = async () => {
-    // Assuming a backend endpoint like this exists for sellers
-    const response = await api.get('/seller/products');
+    const response = await api.get('/seller/items');
     return response.data;
-};
+};  

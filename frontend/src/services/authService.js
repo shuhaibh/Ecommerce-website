@@ -1,12 +1,12 @@
 import api from './api';
 
 export const login = async (email, password) => {
-  const response = await api.post('/login', { email, password });
+  const response = await api.post('/user/login', { email, password });
   return response.data;
 };
 
 export const register = async (userData) => {
-  const response = await api.post('/register', userData, {
+  const response = await api.post('/user/register', userData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -15,7 +15,7 @@ export const register = async (userData) => {
 };
 
 export const logout = async () => {
-  const response = await api.get('/logout');
+  const response = await api.get('/user/logout');
   return response.data;
 };
 
@@ -24,7 +24,6 @@ export const getMyProfile = async () => {
   return response.data;
 };
 
-// --- New function to update user profile ---
 export const updateProfile = async (userData) => {
   const response = await api.put('/me/update', userData, {
     headers: {
@@ -34,9 +33,11 @@ export const updateProfile = async (userData) => {
   return response.data;
 };
 
+// --- New functions for password reset ---
+
 export const forgotPassword = async (email) => {
   const response = await api.post('/password/forgot', { email });
-  return response.data;a
+  return response.data;
 };
 
 export const resetPassword = async (token, passwords) => {

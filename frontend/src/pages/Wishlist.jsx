@@ -57,7 +57,7 @@ const Wishlist = () => {
                     <button 
                         onClick={() => removeItemFromWishlist(product._id)}
                         className="w-full px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded hover:bg-red-600 transition-colors"
-              a      >
+                   >
                         Remove
                     </button>
                 </div>

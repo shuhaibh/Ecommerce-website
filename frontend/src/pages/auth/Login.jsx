@@ -13,7 +13,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/'); // Redirect if already logged in
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
@@ -24,11 +24,13 @@ const Login = () => {
 
     try {
       const data = await login(email, password);
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to login');
+      // Explicitly check for success before navigating
+      if (data && data.success) {
+        navigate('/');
+      } else {
+        // Use the error message from the backend if available
+        throw new Error(data.message || 'Login failed. Please check your credentials.');
       }
-      // Navigate to home on successful login
-      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'An error occurred. Please try again.');
     } finally {
@@ -51,41 +53,27 @@ const Login = () => {
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label 
-              htmlFor="email" 
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
+            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
               Email address
             </label>
             <input
-              type="email"
-              id="email"
+              type="email" id="email"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-              placeholder="name@company.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              placeholder="name@company.com" value={email} onChange={(e) => setEmail(e.target.value)} required
             />
           </div>
           <div>
-            <label 
-              htmlFor="password" 
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
+            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
               Password
             </label>
             <input
-              type="password"
-              id="password"
+              type="password" id="password"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required
             />
           </div>
           <div className="flex items-center justify-between">
-            <Link to="/password/reset" className="text-sm text-blue-600 hover:underline dark:text-blue-500">
+            <Link to="/password/forgot" className="text-sm text-blue-600 hover:underline dark:text-blue-500">
               Forgot Password?
             </Link>
           </div>

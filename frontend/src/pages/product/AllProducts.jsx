@@ -10,7 +10,6 @@ const AllProducts = () => {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [productsCount, setProductsCount] = useState(0);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -19,9 +18,10 @@ const AllProducts = () => {
       try {
         const data = await getProducts({ page });
         if (data.success) {
-          setProducts(data.products);
-          setTotalPages(Math.ceil(data.productsCount / data.resultPerPage));
-          setProductsCount(data.productsCount);
+          // Corrected from data.products to data.items
+          setProducts(data.items); 
+          // Corrected from data.productsCount to data.itemsCount
+          setTotalPages(Math.ceil(data.itemsCount / data.resultPerPage)); 
         } else {
           throw new Error('Could not fetch products');
         }
@@ -47,8 +47,6 @@ const AllProducts = () => {
         All Products
       </h1>
       
-      {/* TODO: Add Filters and Search Bar here */}
-
       {loading ? (
         <Loader />
       ) : error ? (
@@ -61,7 +59,6 @@ const AllProducts = () => {
             ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-12 space-x-4">
               <button
