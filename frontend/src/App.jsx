@@ -1,23 +1,17 @@
-import { useState } from "react";
-import "./App.css";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import ProductCard from "./components/ProductCard";
-
-const dummyProduct = {
-  _id: "123",
-  name: "Stylish Shirt",
-  price: 799,
-  image: "https://via.placeholder.com/300x200",
-  rating: 4.3,
-  inWishlist: false,
-};
+import React from 'react';
+import Header from './components/common/Header';
+import Footer from './components/common/Footer';
+import AppRoutes from './routes/AppRoutes'; // 1. Import the new AppRoutes component
 
 function App() {
   return (
-    <>
-
-    </>
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Header />
+      <main className="flex-grow">
+        <AppRoutes /> {/* 2. Render the AppRoutes component here */}
+      </main>
+      <Footer />
+    </div>
   );
 }
 
