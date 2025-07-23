@@ -1,16 +1,34 @@
 const express = require('express');
 const adminRouter = express.Router();
 
-const { getAllOrders } = require('../controllers/adminController');
-const { getPendingProducts } = require('../controllers/adminController');
-const { approveProduct } = require('../controllers/adminController');
-const { rejectProduct } = require('../controllers/adminController');
+// Import controller functions
+const { 
+    getAllOrders, 
+    getPendingProducts, 
+    approveProduct, 
+    rejectProduct,
+    getAllUsers,
+    updateUser,
+    deleteUser
+} = require('../controllers/adminController');
 
-const authAdmin = require('../middlewares/authAdmin')
+// Import your admin authentication middleware
+const authAdmin = require('../middlewares/authAdmin');
 
+// Apply admin authentication to all routes in this file
+adminRouter.use(authAdmin);
+
+// --- Product Management ---
+adminRouter.get('/products/pending', getPendingProducts);
+adminRouter.patch('/products/approve/:productId', approveProduct);
+adminRouter.patch('/products/reject/:productId', rejectProduct);
+
+// --- Order Management ---
 adminRouter.get('/orders', getAllOrders);
-adminRouter.get('/products/pending', authAdmin, getPendingProducts);
-adminRouter.patch('/products/approve/:productId', authAdmin, approveProduct);
-adminRouter.patch('/products/reject/:productId', authAdmin, rejectProduct);
+
+// --- User Management ---
+adminRouter.get('/users', getAllUsers);
+adminRouter.patch('/users/:userId', updateUser); // For updating roles
+adminRouter.delete('/users/:userId', deleteUser);
 
 module.exports = adminRouter;

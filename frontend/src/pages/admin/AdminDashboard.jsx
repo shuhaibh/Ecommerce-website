@@ -1,20 +1,21 @@
+// Refactored with clearer, role-appropriate navigation.
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const AdminDashboard = () => {
-  // In a real app, you'd fetch stats like total sales, number of users, etc.
+  // In a real app, these stats would be fetched from the backend
   const stats = [
     { label: 'Total Sales', value: '$54,320' },
     { label: 'Total Orders', value: '1,250' },
-    { label: 'Total Products', value: '340' },
+    { label: 'Pending Products', value: '15' }, // More relevant stat
     { label: 'Total Users', value: '850' },
   ];
 
   const adminLinks = [
-    { to: '/admin/products', label: 'Manage Products', description: 'View, edit, and create products.' },
-    { to: '/admin/orders', label: 'Manage Orders', description: 'View and process customer orders.' },
+    { to: '/admin/product-approvals', label: 'Product Approvals', description: 'Approve or reject new seller products.' },
+    { to: '/admin/orders', label: 'Manage Orders', description: 'View and process all customer orders.' },
     { to: '/admin/users', label: 'Manage Users', description: 'View and manage user accounts and roles.' },
-    { to: '/admin/reviews', label: 'Manage Reviews', description: 'Moderate product reviews.' },
   ];
 
   return (
@@ -23,7 +24,6 @@ const AdminDashboard = () => {
         Admin Dashboard
       </h1>
 
-      {/* Stats Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat) => (
           <div key={stat.label} className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
@@ -33,7 +33,6 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Navigation Links Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {adminLinks.map((link) => (
           <Link 

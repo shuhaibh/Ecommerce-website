@@ -6,7 +6,7 @@ import Loader from '../../components/common/Loader';
 import MessageBox from '../../components/common/MessageBox';
 
 const UserProfile = () => {
-  const { user, loadUser } = useAuth(); // Assuming loadUser is exposed from AuthContext to refresh state
+  const { user, loadUser } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [avatar, setAvatar] = useState('');
@@ -21,7 +21,8 @@ const UserProfile = () => {
     if (user) {
       setName(user.name);
       setEmail(user.email);
-      setAvatarPreview(user.avatar?.url);
+      // Corrected to use 'profileImage' from your user model
+      setAvatarPreview(user.profileImage); 
     }
   }, [user]);
 
@@ -46,25 +47,29 @@ const UserProfile = () => {
     setSuccess('');
 
     const formData = new FormData();
-    formData.set('name', name);
-    formData.set('email', email);
+    formData.append('name', name);
+    formData.append('email', email);
     if (avatar) {
-      formData.set('avatar', avatar);
+      // --- THIS IS THE KEY FIX ---
+      // Changed 'avatar' to 'profileImage' to match the backend route
+      formData.append('profileImage', avatar);
     }
 
     try {
-      const data = await updateProfile(formData);
-      if (data.success) {
+      // Assuming your updateProfile service is correctly configured
+      const data = await updateProfile(formData); 
+      
+      // Check for the response structure from your controller
+      if (data && data.data) {
         setSuccess('Profile updated successfully!');
-        // Reload user data in the context to reflect changes globally
         if (loadUser) {
           await loadUser();
         }
       } else {
-        throw new Error('Failed to update profile');
+        throw new Error(data.message || 'Failed to update profile');
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'An error occurred.');
+      setError(err.response?.data?.error || err.message || 'An error occurred.');
     } finally {
       setLoading(false);
     }
@@ -78,33 +83,33 @@ const UserProfile = () => {
     <div className="container mx-auto px-4 py-8 flex justify-center">
       <div className="w-full max-w-lg">
         <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-8 space-y-6">
-          <h1 className="text-2xl font-bold text-center">My Profile</h1>
+          <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">My Profile</h1>
 
           {error && <MessageBox variant="error">{error}</MessageBox>}
           {success && <MessageBox variant="success">{success}</MessageBox>}
 
           <div className="flex justify-center">
             <div className="relative">
-              <img src={avatarPreview} alt="Avatar" className="w-32 h-32 rounded-full object-cover border-4 border-gray-200" />
-              <label htmlFor="avatar" className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700">
+              <img src={avatarPreview} alt="Avatar" className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600" />
+              <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700">
                 ✏️
-                <input type="file" id="avatar" className="hidden" accept="image/*" onChange={handleAvatarChange} />
+                <input type="file" id="avatar-upload" className="hidden" accept="image/*" onChange={handleAvatarChange} />
               </label>
             </div>
           </div>
 
           <div>
-            <label htmlFor="name" className="block mb-2 text-sm font-medium">Full Name</label>
-            <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} required className="w-full p-2.5 border rounded-lg" />
+            <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Full Name</label>
+            <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} required className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
           </div>
 
           <div>
-            <label htmlFor="email" className="block mb-2 text-sm font-medium">Email Address</label>
-            <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-2.5 border rounded-lg" />
+            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Email Address</label>
+            <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
           </div>
 
           <button type="submit" className="w-full mt-4 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400" disabled={loading}>
-            {loading ? <Loader /> : 'Update Profile'}
+            {loading ? 'Updating...' : 'Update Profile'}
           </button>
         </form>
       </div>

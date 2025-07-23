@@ -1,32 +1,31 @@
-const express = require('express')
-const userRouter = express.Router()
+const express = require('express');
+const userRouter = express.Router();
 
-const { register } = require('../controllers/userController');
-const { login } = require('../controllers/userController');
-const { logout } = require('../controllers/userController');
-const { getProfile } = require('../controllers/userController');
-const { updateProfile } = require('../controllers/userController');
-const { deleteUser } = require('../controllers/userController');
-const { checkUser } = require('../controllers/userController');
-const { becomeSeller } = require('../controllers/userController');
+const { 
+    register,
+    login,
+    logout,
+    getProfile,
+    updateProfile,
+    upload, 
+    deleteUser,
+    checkUser,
+    becomeSeller
+} = require('../controllers/userController');
 
-const authUser = require('../middlewares/authUser')
-const authAdmin = require('../middlewares/authAdmin')
+const authUser = require('../middlewares/authUser');
+const authAdmin = require('../middlewares/authAdmin');
 
-userRouter.post('/register', register)
+userRouter.post('/register', register);
+userRouter.post('/login', login);
+userRouter.get('/logout', logout);
+userRouter.get('/profile', authUser, getProfile);
 
-userRouter.post('/login', login)
+// This is the single, correct route for updating the profile with an image
+userRouter.put('/update', authUser, upload.single('profileImage'), updateProfile);
 
-userRouter.get('/logout', logout)
-
-userRouter.get('/profile', authUser, getProfile)
-
-userRouter.patch('/update', authUser, updateProfile)
-
-userRouter.delete('/delete/:userId', authAdmin, deleteUser)
-
-userRouter.get('/check-user', authUser, checkUser)
-
+userRouter.delete('/delete/:userId', authAdmin, deleteUser);
+userRouter.get('/check-user', authUser, checkUser);
 userRouter.patch('/become-seller', authUser, becomeSeller);
-
-module.exports = userRouter
+ 
+module.exports = userRouter;

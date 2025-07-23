@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import * as authService from '../services/authService';
-import Loader from '../components/common/Loader'; // Assuming you have a Loader component
+import Loader from '../components/common/Loader';
 
 const AuthContext = createContext(null);
 
@@ -14,13 +14,18 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const loadUser = useCallback(async () => {
+    setLoading(true);
     try {
-      const data = await authService.getMyProfile();
-      if (data.success) {
-        setUser(data.user);
+      const response = await authService.getMyProfile();
+      if (response && response.data) {
+        setUser(response.data);
         setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
       }
     } catch (error) {
+      console.error("Failed to load user profile:", error);
       setUser(null);
       setIsAuthenticated(false);
     } finally {
@@ -33,11 +38,21 @@ export const AuthProvider = ({ children }) => {
   }, [loadUser]);
 
   const login = async (email, password) => {
-    const data = await authService.login(email, password);
-    if (data.success) {
-      await loadUser();
+    try {
+      const response = await authService.login(email, password);
+      if (response && response.userObject) {
+        setUser(response.userObject);
+        setIsAuthenticated(true);
+        return { success: true, user: response.userObject };
+      } else {
+        throw new Error(response.message || 'Login failed, please try again.');
+      }
+    } catch (error) {
+      console.error("Login failed in context:", error);
+      setUser(null);
+      setIsAuthenticated(false);
+      return { success: false, message: error.response?.data?.error || error.message };
     }
-    return data;
   };
 
   const register = async (userData) => {
@@ -49,9 +64,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await authService.logout();
-    setUser(null);
-    setIsAuthenticated(false);
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setUser(null);
+      setIsAuthenticated(false);
+    }
   };
 
   const value = {
@@ -64,7 +84,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (loading) {
-    // You can return a full-page loader here
     return <Loader />;
   }
 

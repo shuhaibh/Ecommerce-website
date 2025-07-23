@@ -8,7 +8,7 @@ function App() {
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
       <main className="flex-grow">
-        <AppRoutes /> {/* 2. Render the AppRoutes component here */}
+        <AppRoutes /> 
       </main>
       <Footer />
     </div>

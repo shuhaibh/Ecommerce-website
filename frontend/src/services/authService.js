@@ -6,11 +6,7 @@ export const login = async (email, password) => {
 };
 
 export const register = async (userData) => {
-  const response = await api.post('/user/register', userData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const response = await api.post('/user/register', userData);
   return response.data;
 };
 
@@ -25,7 +21,7 @@ export const getMyProfile = async () => {
 };
 
 export const updateProfile = async (userData) => {
-  const response = await api.put('/me/update', userData, {
+  const response = await api.put('/user/update', userData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -33,7 +29,6 @@ export const updateProfile = async (userData) => {
   return response.data;
 };
 
-// --- New functions for password reset ---
 
 export const forgotPassword = async (email) => {
   const response = await api.post('/password/forgot', { email });
