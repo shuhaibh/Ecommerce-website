@@ -1,41 +1,38 @@
 import api from './api';
 
-// --- Product Approval ---
+// --- Product Management ---
 export const getPendingProducts = async () => {
-  const response = await api.get('/admin/products/pending');
-  return response.data;
+  const { data } = await api.get('/admin/products');
+  return data;
 };
 
 export const approveProduct = async (productId) => {
-  const response = await api.patch(`/admin/products/approve/${productId}`);
-  return response.data;
+  const { data } = await api.patch(`/admin/products/approve/${productId}`);
+  return data;
 };
 
 export const rejectProduct = async (productId) => {
-  const response = await api.patch(`/admin/products/reject/${productId}`);
-  return response.data;
+  const { data } = await api.patch(`/admin/products/reject/${productId}`);
+  return data;
 };
-
 
 // --- Order Management ---
 export const getAllOrders = async () => {
-  const response = await api.get('/admin/orders');
-  return response.data;
+  const { data } = await api.get('/admin/orders');
+  return data;
 };
 
-
-// --- User Management ---
-export const getAllUsers = async () => {
-  const response = await api.get('/admin/users');
-  return response.data;
+export const getOrderDetails = async (orderId) => {
+    const { data } = await api.get(`/admin/orders/${orderId}`);
+    return data;
 };
 
-export const updateUser = async (userId, userData) => {
-  const response = await api.patch(`/admin/users/${userId}`, userData);
-  return response.data;
+export const updateOrderStatus = async (orderId, statusData) => {
+    const { data } = await api.patch(`/admin/orders/${orderId}`, statusData);
+    return data;
 };
 
-export const deleteUser = async (userId) => {
-  const response = await api.delete(`/admin/users/${userId}`);
-  return response.data;
+export const deleteOrder = async (orderId) => {
+  const { data } = await api.delete(`/admin/orders/${orderId}`);
+  return data;
 };

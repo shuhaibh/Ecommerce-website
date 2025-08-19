@@ -29,14 +29,13 @@ import UserOrders from '../pages/user/UserOrders';
 import OrderConfirm from '../pages/order/OrderConfirm';
 import OrderSuccess from '../pages/order/OrderSuccess';
 import OrderDetail from '../pages/order/OrderDetail';
-import Payment from '../pages/payment/Payment'; // 1. Import Payment component
+import Payment from '../pages/payment/Payment';
 
 // --- Admin Pages ---
 import AdminDashboard from '../pages/admin/AdminDashboard';
-import ProductManagement from '../pages/admin/ProductManagement';
-import CreateProduct from '../pages/admin/CreateProduct';
-import UpdateProduct from '../pages/admin/UpdateProduct';
+import AdminProductManagement from '../pages/admin/AdminProductManagement';
 import AdminOrderManagement from '../pages/admin/AdminOrderManagement';
+import AdminUpdateOrder from '../pages/admin/AdminUpdateOrder';
 import AdminUserManagement from '../pages/admin/AdminUserManagement';
 import AdminUpdateUser from '../pages/admin/AdminUpdateUser';
 
@@ -44,8 +43,10 @@ import AdminUpdateUser from '../pages/admin/AdminUpdateUser';
 import SellerDashboard from '../pages/seller/SellerDashboard';
 import SellerProductManagement from '../pages/seller/SellerProductManagement';
 import SellerOrders from '../pages/seller/SellerOrders';
+import CreateProduct from '../pages/admin/CreateProduct';
+import UpdateProduct from '../pages/admin/UpdateProduct';
 
-// 2. Load Stripe with your publishable key from your backend's .env file
+
 const stripePromise = loadStripe('pk_test_51BTUDGJAJfZb9HEBwDg86TN1KNprHjkfipXyAlLpUmvD4LMAkLxjBsTBGS7OiFPODl72DR5SgBStNMFdktUBe4wF00IdA9fRZY');
 
 const AppRoutes = () => {
@@ -70,17 +71,15 @@ const AppRoutes = () => {
         <Route path="/order/confirm" element={<OrderConfirm />} />
         <Route path="/order/success" element={<OrderSuccess />} />
         <Route path="/order/:id" element={<OrderDetail />} />
-        {/* 3. Add the protected payment route, wrapped with the Elements provider */}
         <Route path="/payment" element={<Elements stripe={stripePromise}><Payment /></Elements>} />
       </Route>
 
       {/* --- Protected Admin Routes --- */}
       <Route element={<ProtectedRoute isAdmin={true} />}>
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<ProductManagement />} />
-        <Route path="/admin/product/new" element={<CreateProduct />} />
-        <Route path="/admin/product/:id" element={<UpdateProduct />} />
+        <Route path="/admin/products" element={<AdminProductManagement />} />
         <Route path="/admin/orders" element={<AdminOrderManagement />} />
+        <Route path="/admin/order/:orderId" element={<AdminUpdateOrder />} />
         <Route path="/admin/users" element={<AdminUserManagement />} />
         <Route path="/admin/user/:id" element={<AdminUpdateUser />} />
       </Route>

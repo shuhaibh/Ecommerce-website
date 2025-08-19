@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProductDetails } from '../../services/productService';
@@ -24,8 +23,10 @@ const Product = () => {
       setError('');
       try {
         const data = await getProductDetails(productId);
-        setProduct(data); // The entire response is the product object
-        if (data.item_id && data.item_id.images && data.item_id.images.length > 0) {
+        setProduct(data);
+
+        // **FIX:** Check if images exist and are not empty before setting the main image.
+        if (data?.item_id?.images?.length > 0) {
           setMainImage(data.item_id.images[0].url);
         }
       } catch (err) {
@@ -40,15 +41,13 @@ const Product = () => {
 
   const handleQuantityChange = (amount) => {
     const newQuantity = quantity + amount;
-    // Access Stock from the nested item_id object
-    if (newQuantity > 0 && newQuantity <= product.item_id.Stock) {
+    if (newQuantity > 0 && newQuantity <= product?.item_id?.Stock) {
       setQuantity(newQuantity);
     }
   };
 
   const handleAddToCart = () => {
-    // Pass the correct item object to the cart
-    addItemToCart(product.item_id, quantity);
+    addItemToCart(product, quantity); // It's often better to pass the whole product
     setAddedToCart(true);
     setTimeout(() => {
       setAddedToCart(false);
@@ -57,10 +56,9 @@ const Product = () => {
 
   if (loading) return <div className="flex justify-center items-center h-screen"><Loader /></div>;
   if (error) return <div className="p-8"><MessageBox variant="error">{error}</MessageBox></div>;
-  // Check for product and the nested item_id
   if (!product || !product.item_id) return <div className="p-8"><MessageBox>Product not found.</MessageBox></div>;
 
-  const item = product.item_id; // Use a shorthand variable for the nested item
+  const item = product.item_id;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -70,7 +68,8 @@ const Product = () => {
             <img src={mainImage} alt={item.name} className="h-full w-full object-cover object-center" />
           </div>
           <div className="flex space-x-2">
-            {item.images.map((img) => (
+            {/* **FIX:** Check if item.images is an array before mapping over it. */}
+            {item.images && item.images.map((img) => (
               <button
                 key={img.public_id}
                 onClick={() => setMainImage(img.url)}
@@ -86,11 +85,11 @@ const Product = () => {
           <p className="text-sm text-gray-500 mt-2">Product # {product._id}</p>
           
           <div className="flex items-center my-4">
-            <StarRating rating={item.ratings} />
-            <span className="ml-3 text-sm text-gray-500">({item.numOfReviews} Reviews)</span>
+            <StarRating rating={item.ratings || 0} />
+            <span className="ml-3 text-sm text-gray-500">({item.numOfReviews || 0} Reviews)</span>
           </div>
 
-          <p className="text-3xl text-gray-900 dark:text-white my-4">${item.price.toFixed(2)}</p>
+          <p className="text-3xl text-gray-900 dark:text-white my-4">${item.price?.toFixed(2) || '0.00'}</p>
           
           <div className="flex items-center my-4">
             <button onClick={() => handleQuantityChange(-1)} className="px-3 py-1 border rounded-l-md">-</button>
@@ -101,14 +100,14 @@ const Product = () => {
           <button 
             onClick={handleAddToCart}
             className={`w-full max-w-xs mt-4 px-6 py-3 text-base font-medium text-white rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors duration-300 ${addedToCart ? 'bg-green-500' : 'bg-blue-600 hover:bg-blue-700'} disabled:bg-gray-400`}
-            disabled={item.Stock < 1 || addedToCart}
+            disabled={!item.Stock || item.Stock < 1 || addedToCart}
           >
-            {item.Stock < 1 ? 'Out of Stock' : addedToCart ? 'Added!' : 'Add to Cart'}
+            {!item.Stock || item.Stock < 1 ? 'Out of Stock' : addedToCart ? 'Added!' : 'Add to Cart'}
           </button>
 
           <div className="my-6">
-            <p className={`text-lg font-semibold ${item.Stock < 1 ? 'text-red-500' : 'text-green-500'}`}>
-              Status: {item.Stock < 1 ? 'Out of Stock' : 'In Stock'}
+            <p className={`text-lg font-semibold ${!item.Stock || item.Stock < 1 ? 'text-red-500' : 'text-green-500'}`}>
+              Status: {!item.Stock || item.Stock < 1 ? 'Out of Stock' : 'In Stock'}
             </p>
           </div>
 
